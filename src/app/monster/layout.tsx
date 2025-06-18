@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import Navbar from "@/components/layout/Navbar";
 
 const geistSans = Geist({
@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Skill & Spell Simulator",
-  description: "Skill & Spell Simulator",
+  title: "Monster Simulator",
+  description: "Monster Simulator",
 };
 
 export default function RootLayout({
