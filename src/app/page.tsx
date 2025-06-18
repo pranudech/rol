@@ -1,103 +1,100 @@
-import Image from "next/image";
+"use client";
+import React, { useState, useEffect } from "react";
+import { parseNumber } from "@/Utils";
+import { SKILL_DATA } from "@/data/skills";
+import SkillSelector from "./component/SkillSelector";
+import StatInput from "./component/StatInput";
+import ResultCard from "./component/ResultCard";
+import GlossarySection from "./component/GlossarySection";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [classIdx, setClassIdx] = useState(0);
+  const [skillIdx, setSkillIdx] = useState(0);
+  const [woeMode, setWoeMode] = useState(false);
+  const [baseMode, setBaseMode] = useState<"630" | "530">("630");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  const [dex, setDex] = useState(99);
+  const [intStat, setIntStat] = useState(40);
+  const [vct, setVct] = useState(0);
+  const [fct, setFct] = useState(0);
+
+  const selectedClass = SKILL_DATA[classIdx];
+  const selectedSkill = selectedClass.skills[skillIdx];
+  const skillData =
+    woeMode && selectedSkill.woe ? selectedSkill.woe : selectedSkill;
+
+  const [delay, setDelay] = useState(skillData.baseDelay);
+  const [cooldown, setCooldown] = useState(skillData.baseCooldown);
+
+  // update delay/cooldown เมื่อเปลี่ยนสกิล/WOE
+  useEffect(() => {
+    setDelay(skillData.baseDelay);
+    setCooldown(skillData.baseCooldown);
+  }, [classIdx, skillIdx, woeMode]);
+
+  // สูตรคำนวณ
+  const baseValue = baseMode === "630" ? 630 : 530;
+  const statSum = dex * 2 + intStat;
+  const sqrtTerm = Math.sqrt(statSum / baseValue);
+  const vctRate = 1 - Math.min(sqrtTerm, 1);
+  const vctPercent = 1 - vct / 100;
+  const vctRaw = skillData.baseVCT * vctRate * vctPercent;
+  const fctRaw = skillData.baseFCT * (1 - fct / 100);
+  const totalCast = vctRaw + fctRaw;
+  const resultTime = Math.max(totalCast, delay, cooldown);
+
+  // --- Render ---
+  return (
+    <main className="min-h-screen bg-gradient-to-tr from-blue-50 via-pink-50 to-purple-50 pt-16 pb-10">
+      <div className="max-w-2xl mx-auto px-4">
+        <header className="mb-8 text-center">
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 drop-shadow-lg">
+            Skill & Spell Simulator
+          </h1>
+          <p className="text-gray-500 mt-2 text-base sm:text-lg">Ragnarok Hi-Class WOE/Normal</p>
+        </header>
+        <SkillSelector
+          classIdx={classIdx}
+          setClassIdx={setClassIdx}
+          skillIdx={skillIdx}
+          setSkillIdx={setSkillIdx}
+          woeMode={woeMode}
+          setWoeMode={setWoeMode}
+          selectedClass={{ allClasses: SKILL_DATA, skills: selectedClass.skills }}
+        />
+        <StatInput
+          dex={dex}
+          setDex={setDex}
+          intStat={intStat}
+          setIntStat={setIntStat}
+          vct={vct}
+          setVct={setVct}
+          fct={fct}
+          setFct={setFct}
+          delay={delay}
+          setDelay={setDelay}
+          cooldown={cooldown}
+          setCooldown={setCooldown}
+        />
+        <ResultCard
+          selectedSkill={selectedSkill}
+          vctRaw={vctRaw}
+          fctRaw={fctRaw}
+          totalCast={totalCast}
+          resultTime={resultTime}
+          delay={delay}
+          cooldown={cooldown}
+          skillData={skillData}
+          dex={dex}
+          intStat={intStat}
+          statSum={statSum}
+          sqrtTerm={sqrtTerm}
+          vctPercent={vctPercent}
+          fct={fct}
+          baseMode={baseMode}
+        />
+        <GlossarySection />
+      </div>
+    </main>
   );
 }
