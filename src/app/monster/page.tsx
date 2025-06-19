@@ -11,7 +11,30 @@ const sortOptions = [
   { label: "JOB", value: "job" },
 ];
 
-function SortDropdown({ selected, setSelected }: { selected: string, setSelected: (value: string) => void }) {
+const elementOptions = [
+  "Neutral",
+  "Fire",
+  "Water",
+  "Earth",
+  "Wind",
+  "Poison",
+  "Holy",
+  "Dark",
+];
+
+const raceOptions = ["Plant", "Brute", "Demon", "Undead", "Fish", "Dragon"];
+
+const sizeOptions = ["Small", "Medium", "Large"];
+
+
+
+function SortDropdown({
+  selected,
+  setSelected,
+}: {
+  selected: string;
+  setSelected: (value: string) => void;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -21,8 +44,18 @@ function SortDropdown({ selected, setSelected }: { selected: string, setSelected
         className="bg-gray-100 text-gray-800 px-4 py-2 rounded shadow hover:bg-gray-200 font-semibold flex items-center gap-2"
       >
         {selected}
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
       {open && (
@@ -59,7 +92,7 @@ export default function MonsterPage() {
   const sortedMonsters = [...MONSTER_DATA].sort((a, b) => {
     if (sortBy === "name") {
       return a.name.localeCompare(b.name);
-    }else if (sortBy === "level") {
+    } else if (sortBy === "level") {
       return a.level - b.level;
     }
     // Type assertion to fix TS index error
@@ -70,7 +103,8 @@ export default function MonsterPage() {
     if (element.length > 0 && !element.includes(m.element)) return false;
     if (race.length > 0 && !race.includes(m.race)) return false;
     if (size.length > 0 && !size.includes(m.size)) return false;
-    if (search && !m.name.toLowerCase().includes(search.toLowerCase())) return false;
+    if (search && !m.name.toLowerCase().includes(search.toLowerCase()))
+      return false;
     return true;
   });
 
@@ -80,7 +114,9 @@ export default function MonsterPage() {
       <aside className="w-80 bg-white border rounded-xl m-6 p-6 flex flex-col gap-6 shadow">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gray-200" />
-          <span className="text-lg font-bold text-gray-800">Monster Search</span>
+          <span className="text-lg font-bold text-gray-800">
+            Monster Search
+          </span>
         </div>
         <input
           className="bg-gray-100 text-gray-800 rounded-md px-4 py-2 focus:outline-none"
@@ -90,36 +126,64 @@ export default function MonsterPage() {
         <div>
           <div className="text-gray-500 mb-2 font-semibold">Element</div>
           <div className="flex flex-wrap gap-2">
-            {["Neutral", "Fire", "Water", "Earth", "Wind", "Poison", "Holy", "Dark"].map((el) => (
-              <button key={el} className={`px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs ${element.includes(el) ? "!bg-blue-500 text-white" : ""}`} onClick={() => setElement(element.includes(el) ? element.filter((e: string) => e !== el) : [...element, el])}>{el}</button>
-            ))} 
-          </div>
-        </div>
-        <div>
-          <div className="text-gray-500 mb-2 font-semibold">Race</div>
-          <div className="flex flex-wrap gap-2">
-            {["Plant", "Brute", "Demon", "Undead", "Fish", "Dragon"].map((raceType) => (
+            {elementOptions.map((el) => (
               <button
-                key={raceType}
-                className={`px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs ${race.includes(raceType) ? "!bg-blue-500 text-white" : ""}`}
+                key={el}
+                className={`px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs ${
+                  element.includes(el) ? "!bg-blue-500 text-white" : ""
+                }`}
                 onClick={() =>
-                  setRace(race.includes(raceType) ? race.filter((r: string) => r !== raceType) : [...race, raceType])
+                  setElement(
+                    element.includes(el)
+                      ? element.filter((e: string) => e !== el)
+                      : [...element, el]
+                  )
                 }
               >
-                {raceType}
+                {el}
               </button>
             ))}
           </div>
         </div>
         <div>
+          <div className="text-gray-500 mb-2 font-semibold">Race</div>
+          <div className="flex flex-wrap gap-2">
+            {raceOptions.map(
+              (raceType) => (
+                <button
+                  key={raceType}
+                  className={`px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs ${
+                    race.includes(raceType) ? "!bg-blue-500 text-white" : ""
+                  }`}
+                  onClick={() =>
+                    setRace(
+                      race.includes(raceType)
+                        ? race.filter((r: string) => r !== raceType)
+                        : [...race, raceType]
+                    )
+                  }
+                >
+                  {raceType}
+                </button>
+              )
+            )}
+          </div>
+        </div>
+        <div>
           <div className="text-gray-500 mb-2 font-semibold">Size</div>
           <div className="flex gap-2">
-            {["Small", "Medium", "Large"].map((sizeType) => (
+            {sizeOptions.map((sizeType) => (
               <button
                 key={sizeType}
-                className={`px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs ${size.includes(sizeType) ? "!bg-blue-500 text-white" : ""}`}
+                className={`px-3 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 text-xs ${
+                  size.includes(sizeType) ? "!bg-blue-500 text-white" : ""
+                }`}
                 onClick={() =>
-                  setSize(size.includes(sizeType) ? size.filter((s: string) => s !== sizeType) : [...size, sizeType])
+                  setSize(
+                    size.includes(sizeType)
+                      ? size.filter((s: string) => s !== sizeType)
+                      : [...size, sizeType]
+                  )
                 }
               >
                 {sizeType}
@@ -137,20 +201,36 @@ export default function MonsterPage() {
         <div className="grid grid-cols-1 gap-6 max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">
           {/* Example Monster Card */}
           {filteredMonsters.map((m, i) => (
-            <div key={i} className="bg-white border rounded-xl p-6 flex items-center gap-6 shadow hover:scale-[1.01] transition">
+            <div
+              key={i}
+              className="bg-white border rounded-xl p-6 flex items-center gap-6 shadow hover:border-blue-500 transition cursor-pointer"
+            >
               <div className="bg-gray-200 flex items-center justify-center rounded">
                 {/* Monster image placeholder */}
-                {/* <span className="text-2xl text-gray-700">🐾</span> */}
-                <img src={`https://rolth.maxion.gg/_next/image?url=https%3A%2F%2Fcdn.maxion.gg%2Flandverse%2Fimage-th%2Fmonster%2F${m.id}.gif&w=96&q=75`} alt={m.name} className="w-[80px] h-[80px]" />
+                <img
+                  src={`https://rolth.maxion.gg/_next/image?url=https%3A%2F%2Fcdn.maxion.gg%2Flandverse%2Fimage-th%2Fmonster%2F${m.id}.gif&w=96&q=75`}
+                  alt={m.name}
+                  className="w-[80px] h-[80px]"
+                />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold text-gray-800">{m.name}</span>
-                  <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded">{m.element}</span>
-                  <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded">{m.race}</span>
-                  <span className="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded">{m.size}</span>
+                  <span className="text-lg font-bold text-gray-800">
+                    {m.name}
+                  </span>
+                  <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded">
+                    {m.element}
+                  </span>
+                  <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded">
+                    {m.race}
+                  </span>
+                  <span className="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded">
+                    {m.size}
+                  </span>
                 </div>
-                <div className="text-gray-500 text-sm mt-1">HP: 100 | HIT/FLEE: 200/150 | EXP: 50/20</div>
+                <div className="text-gray-500 text-sm mt-1">
+                  HP: {m.hp} | HIT/FLEE: 0/0 | EXP: {m.base_exp} JOB: {m.job_exp}
+                </div>
               </div>
             </div>
           ))}
